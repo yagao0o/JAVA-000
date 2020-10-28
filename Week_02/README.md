@@ -194,8 +194,8 @@
 （略）:P
 
 ## Day4 作业
-**1、(可选)运行课上的例子，以及 Netty 的例子，分析相关现象。**
-（暂略，下周补齐）:P
+**1、(可选)运行课上的例子，以及 Netty 的例子，分析相关现象。**  
+（暂略，下周补齐）:P  
 **2、写一段代码，使用 HttpClient 或 OkHttp 访问 http://localhost:8801，代码提交到 Github。**
 ```Java
 package luyz.learn;
