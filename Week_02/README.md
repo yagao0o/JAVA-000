@@ -194,8 +194,81 @@
 （略）:P
 
 ## Day4 作业
-**1、(可选)运行课上的例子，以及 Netty 的例子，分析相关现象。**  
-（暂略，下周补齐）:P  
+**1、(可选)运行课上的例子，以及 Netty 的例子，分析相关现象。**    
+    测试命令及参数：``sb -u http://localhost:*/ -c 40 -N 30``
+    
+- HttpServer01 BIO版本
+```
+RPS: 31.7 (requests/second)
+Max: 1481ms
+Min: 279ms
+Avg: 1234.2ms
+
+  50%	below 1251ms
+  60%	below 1251ms
+  70%	below 1252ms
+  80%	below 1252ms
+  90%	below 1253ms
+  95%	below 1255ms
+  98%	below 1257ms
+  99%	below 1265ms
+99.9%	below 1481ms
+```
+- HttpServer02 多线程版本
+```
+RPS: 985 (requests/second)
+Max: 316ms
+Min: 0ms
+Avg: 33.5ms
+
+  50%	below 29ms
+  60%	below 31ms
+  70%	below 33ms
+  80%	below 38ms
+  90%	below 47ms
+  95%	below 61ms
+  98%	below 83ms
+  99%	below 101ms
+99.9%	below 167ms
+```
+
+- HttpServer03 线程池版本
+```
+RPS: 1003.2 (requests/second)
+Max: 314ms
+Min: 0ms
+Avg: 30.1ms
+
+  50%	below 27ms
+  60%	below 28ms
+  70%	below 30ms
+  80%	below 31ms
+  90%	below 37ms
+  95%	below 51ms
+  98%	below 84ms
+  99%	below 106ms
+99.9%	below 156ms
+```
+
+- Netty 版本
+```
+RPS: 4017.1 (requests/second)
+Max: 353ms
+Min: 0ms
+Avg: 0.9ms
+
+  50%	below 0ms
+  60%	below 0ms
+  70%	below 0ms
+  80%	below 0ms
+  90%	below 1ms
+  95%	below 4ms
+  98%	below 13ms
+  99%	below 22ms
+99.9%	below 47ms
+```
+
+
 **2、写一段代码，使用 HttpClient 或 OkHttp 访问 http://localhost:8801，代码提交到 Github。**
 ```Java
 package luyz.learn;
