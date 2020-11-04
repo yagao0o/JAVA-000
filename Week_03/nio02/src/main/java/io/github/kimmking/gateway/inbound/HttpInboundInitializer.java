@@ -1,5 +1,6 @@
 package io.github.kimmking.gateway.inbound;
 
+import io.github.kimmking.gateway.outbound.homework.HeaderHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -20,9 +21,11 @@ public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 //		if (sslCtx != null) {
 //			p.addLast(sslCtx.newHandler(ch.alloc()));
 //		}
+
 		p.addLast(new HttpServerCodec());
 		//p.addLast(new HttpServerExpectContinueHandler());
 		p.addLast(new HttpObjectAggregator(1024 * 1024));
+		p.addLast(new HeaderHandler());
 		p.addLast(new HttpInboundHandler(this.proxyServer));
 	}
 }

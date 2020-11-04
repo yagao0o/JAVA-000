@@ -3,10 +3,7 @@ package io.github.kimmking.gateway.outbound.homework;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -35,7 +32,7 @@ public class SimpleHandler {
 
     public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx) {
         final String url = this.backendUrl + fullRequest.uri();
-        String result = doRequest(url);
+        String result = doRequest(url, fullRequest.headers());
         FullHttpResponse response = null;
         if (result == null || result.isEmpty()) {
             response = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
@@ -56,9 +53,12 @@ public class SimpleHandler {
 
     }
 
-    private String doRequest(String url) {
+    private String doRequest(String url, HttpHeaders headers) {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
+        headers.forEach(i -> {
+            httpGet.setHeader(i.getKey(), i.getValue());
+        });
         try {
             CloseableHttpResponse response = client.execute(httpGet);
             HttpEntity responseEntity = response.getEntity();

@@ -61,9 +61,10 @@ public class SimpleNettyChannelInboundHandler extends ChannelInboundHandlerAdapt
         FullHttpRequest request = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_0, HttpMethod.GET, url.toASCIIString());
         request.headers()
-                .set(HttpHeaderNames.CONTENT_TYPE, "text/plain;charset=UTF-8")
+                .setAll(originRequest.headers())
+//                .set(HttpHeaderNames.CONTENT_TYPE, "text/plain;charset=UTF-8")
                 //开启长连接
-                .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
+//                .set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE)
                 //设置传递请求内容的长度
                 .set(HttpHeaderNames.CONTENT_LENGTH, request.content().readableBytes());
         //发送数据
