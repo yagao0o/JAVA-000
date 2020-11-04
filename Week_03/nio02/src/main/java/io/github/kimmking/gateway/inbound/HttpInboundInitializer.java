@@ -1,17 +1,21 @@
 package io.github.kimmking.gateway.inbound;
 
 import io.github.kimmking.gateway.outbound.homework.HeaderHandler;
+import io.github.kimmking.gateway.outbound.homework.router.RandomEndpointRouter;
+import io.github.kimmking.gateway.router.HttpEndpointRouter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
+import java.util.List;
+
 public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 	
-	private String proxyServer;
-	
-	public HttpInboundInitializer(String proxyServer) {
+	private List<String> proxyServer;
+
+	public HttpInboundInitializer(List<String> proxyServer) {
 		this.proxyServer = proxyServer;
 	}
 	

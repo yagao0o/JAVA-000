@@ -3,8 +3,11 @@
 基础代码可以 fork:https://github.com/kimmking/JavaCourseCodes 02nio/nio02 文件夹下
 实现以后，代码提交到 Github。
 
+---
+***作业项目完整代码: [nio02链接](./nio02),netty client的地方参考了很多百度，不知道写的对不对，请助教老师指点一下。***
+---
+---
 ## Day5 作业
-作业项目完整代码: [nio02](./nio02)
 
 **一、整合你上次作业的 httpclient/okhttp**  
 > 将netty的server，把写死的字符串，替换为使用httpclient或者okhttp方式来调用后段的服务，返回后端的响应数据。
@@ -293,3 +296,126 @@ public void channelActive(ChannelHandlerContext ctx) throws Exception {
 > - server01，20
 > - server02，30
 > - server03，50
+
+- 将proxyServer修改为使用逗号分隔的目标服务器列表
+- 在权重模式下，新增一个配置proxyServerWeights，为逗号分隔的目标服务器权重列表，数量要求与目标服务器一致
+- 路由添加, 在HttpInboundHandler中，在构造函数生成handler时，调用router.route分配目标地址，代码片段如下，全部代码见[源文件链接](./nio02/src/main/java/io/github/kimmking/gateway/inbound/HttpInboundHandler.java)
+```Java
+private final List<String> proxyServer;
+private SimpleNettyHandler handler;
+private HttpEndpointRouter router;
+
+public HttpInboundHandler(List<String> proxyServer) {
+    this.proxyServer = proxyServer;
+    this.router = new WeightEndpointRouter();
+    handler = new SimpleNettyHandler(router.route(this.proxyServer));
+}
+```
+
+- 随机模式，根据proxyServer的大小直接进行random，取对应配置，全部代码见[源文件链接](./nio02/src/main/java/io/github/kimmking/gateway/outbound/homework/router/RandomEndpointRouter.java)
+```Java
+package io.github.kimmking.gateway.outbound.homework.router;
+
+import io.github.kimmking.gateway.router.HttpEndpointRouter;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * @author : Luyz
+ * @date : 2020/11/4 21:42
+ */
+public class RandomEndpointRouter implements HttpEndpointRouter {
+    @Override
+    public String route(List<String> endpoints) {
+        Random random = new Random();
+        return endpoints.get(random.nextInt(endpoints.size()));
+    }
+}
+```
+
+- 轮询模式，设置静态变量计数器i,每次+1，超过大小后从0开始，加synchronized保证线程安全（不知道对不对，请助教老师帮忙看下），全部代码见[源文件链接](./nio02/src/main/java/io/github/kimmking/gateway/outbound/homework/router/RoundRibbonEndpointRouter.java)
+```
+package io.github.kimmking.gateway.outbound.homework.router;
+
+import io.github.kimmking.gateway.router.HttpEndpointRouter;
+
+import java.util.List;
+
+/**
+ * @author : Luyz
+ * @date : 2020/11/4 21:44
+ */
+public class RoundRibbonEndpointRouter implements HttpEndpointRouter {
+    private static Integer i = 0;
+    @Override
+    public String route(List<String> endpoints) {
+        return endpoints.get(getNext(endpoints.size()));
+    }
+
+    private synchronized int getNext(int size) {
+        i += 1;
+        if (i >= size) {
+            i = 0;
+        }
+        return i;
+    }
+}
+```
+
+
+- 按权重分配，新增一个配置proxyServerWeights，为逗号分隔的目标服务器权重列表，数量要求与目标服务器一致，根据权重总量random一个值，再计算其掉落区间，全部代码见[源文件链接](./nio02/src/main/java/io/github/kimmking/gateway/outbound/homework/router/WeightEndpointRouter.java)
+```
+package io.github.kimmking.gateway.outbound.homework.router;
+
+import io.github.kimmking.gateway.router.HttpEndpointRouter;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+/**
+ * @author : Luyz
+ * @date : 2020/11/4 21:45
+ */
+public class WeightEndpointRouter implements HttpEndpointRouter {
+    static List<Integer> weightList;
+    public WeightEndpointRouter() {
+        initWeightList();
+    }
+    /***
+     * @param endpoints
+     * @return
+     */
+    @Override
+    public String route(List<String> endpoints) {
+        int i = getNext();
+        return endpoints.get(i);
+    }
+
+    private int getNext() {
+        Integer total = weightList.stream().reduce(Integer::sum).get();
+        Random random = new Random();
+        int next = random.nextInt(total);
+        for (int i = 0; i < weightList.size(); i++) {
+            next = next - weightList.get(i);
+            if (next < 0) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /***
+     * 暂且默认设置为10，20，40，80的权重
+     */
+    private synchronized void initWeightList() {
+        if (weightList == null || weightList.size() == 0) {
+            String proxyServerWeights = System.getProperty("proxyServerWeights", "10,20,40,80");
+            List<String> weightListString = Arrays.asList(proxyServerWeights.split(","));
+            weightList = weightListString.stream().map(Integer::parseInt).collect(Collectors.toList());
+        }
+    }
+}
+```
