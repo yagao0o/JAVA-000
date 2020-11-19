@@ -144,9 +144,100 @@ public class Garage {
 **2. (选做)maven/spring 的 profile 机制，都有什么用法?**
 
 **3. (必做)给前面课程提供的 Student/Klass/School 实现自动配置和 Starter。**
+
+[项目链接](./my-homework-starter/)，主要代码参考：  
+
+```Java
+package com.qingyi;
+
+import com.qingyi.demo.Car;
+import com.qingyi.demo.Garage;
+import com.qingyi.demo.Model;
+import com.qingyi.prop.SpringBootPropertiesConfiguration;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+
+/**
+ * Spring boot starter configuration.
+ * @author Luyz
+ */
+@Configuration
+@EnableConfigurationProperties(SpringBootPropertiesConfiguration.class)
+@ConditionalOnProperty(prefix = "com.qingyi", name = "enabled", havingValue = "true", matchIfMissing = true)
+@RequiredArgsConstructor
+public class SpringBootConfiguration {
+
+    private final SpringBootPropertiesConfiguration props;
+    @Bean("model3")
+    public Model getModel3() {
+        Model model = new Model();
+        model.setBrand("Tesla");
+        model.setModelName("model 3");
+        model.setPowerType(1);
+        return model;
+    }
+
+    @Bean("c30")
+    public Model getC30() {
+        Model model = new Model();
+        model.setBrand("长城");
+        model.setModelName("C30");
+        model.setPowerType(0);
+        return model;
+    }
+
+    @Bean("littleBlue")
+    @Autowired()
+    public Car getLittleBlue(Model model3){
+        Car car = new Car();
+        car.setModel(model3);
+        car.setNumber("鲁AD1***2");
+        return car;
+    }
+
+    @Bean("oldCar")
+    @Autowired()
+    public Car getOldCar(Model c30){
+        Car car = new Car();
+        car.setModel(c30);
+        car.setNumber("鲁A6***U");
+        return car;
+    }
+
+
+    @Bean("garage")
+    @Autowired
+    public Garage getMyGarage(Car littleBlue, Car oldCar) {
+        Garage garage = new Garage();
+        System.out.println(props.getProps().keySet());
+        garage.setMyCars(new ArrayList<>());
+        garage.getMyCars().add(littleBlue);
+        garage.getMyCars().add(oldCar);
+        return garage;
+    }
+}
+```
+引用方式
+```XML
+<dependency>
+    <groupId>com.qingyi</groupId>
+    <artifactId>my-homework-starter</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
 **4. (选做)总结 Hibernate 与 MyBatis 的各方面异同点。**
+
 **5. (选做)学习 MyBatis-generator 的用法和原理，学会自定义 TypeHandler 处理复杂类型。**
+
 **6. (必做)研究一下 JDBC 接口和数据库连接池，掌握它们的设计和用法:**
-1)使用 JDBC 原生接口，实现数据库的增删改查操作。 
-2)使用事务，PrepareStatement 方式，批处理方式，改进上述操作。 
-3)配置 Hikari 连接池，改进上述操作。提交代码到 Github。
+1. 使用 JDBC 原生接口，实现数据库的增删改查操作。 
+2. 使用事务，PrepareStatement 方式，批处理方式，改进上述操作。 
+3. 配置 Hikari 连接池，改进上述操作。提交代码到 Github。
+
+Error creating bean with name 'getMyGarage' defined in class path resource [com/qingyi/SpringBootConfiguration.class]: Unsatisfied dependency expressed through method 'getMyGarage' parameter 0: Ambiguous argument values for parameter of type [com.qingyi.demo.Car] - did you specify the correct bean references as arguments?
