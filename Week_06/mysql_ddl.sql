@@ -6,7 +6,8 @@ CREATE TABLE `t_user` (
   `address` varchar(128) DEFAULT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_user_UN` (`account`)
 );
 
 CREATE TABLE `t_good` (

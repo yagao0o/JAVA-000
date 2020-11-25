@@ -20,7 +20,7 @@
 另外，数据中存在大量的冗余字段，并且经常会有冗余字段不一致的问题，团队的处理方法是由负责数据的团队，定时同步。这个地方是需要改进的，目前没有想到特别好的方法。
 
 **2、(必做):基于电商交易场景(用户、商品、订单)，设计一套简单的表结构，提交DDL的SQL文件到Github(后面2周的作业依然要是用到这个表结构)。**  
-> 考虑到简单的表结构，用户暂时用一张大表来表示，实际可以拆分为三个表：用户基本信息、密码、收货地址。货物表也未考虑快照等问题，可以按表格式复制一张表，添加快照时间来保存快照信息。订单中包含多个货物，拆分为两张表，订单表及订单详情，订单仅添加一个基本状态，暂不考虑支付等情形。
+> 考虑到简单的表结构，用户暂时用一张大表来表示，实际可以拆分为三个表：用户基本信息、密码、收货地址。货物表也未考虑快照等问题，可以按表格式复制一张表，添加快照时间来保存快照信息;货物表中的价格单位为分。订单中包含多个货物，拆分为两张表，订单表及订单详情，订单仅添加一个基本状态，暂不考虑支付等情形。
 - [MySQL版本](./mysql_ddl.sql)
 ```SQL
 CREATE TABLE `t_user` (
@@ -31,7 +31,8 @@ CREATE TABLE `t_user` (
   `address` varchar(128) DEFAULT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `t_user_UN` (`account`)
 );
 
 CREATE TABLE `t_good` (
@@ -64,10 +65,46 @@ CREATE TABLE `t_order_detail` (
   PRIMARY KEY (`id`)
 );
 ```
+[以下题目均使用homework项目完成](./homework)
+
 **3、(选做):尽可能多的从“常见关系数据库”中列的清单，安装运行，并使用上一题的SQL测试简单的增删改查。**
 - 环境1: MySQL 8.0.22
+[全部代码](./homework/src/main/java/com/qingyi/week6/homework/controller/HomeworkController.java)
+```Java
+@RequestMapping(value = "/testUserOperation", method = RequestMethod.POST)
+public void addUser() {
+    User user;
+    // 添加
+    for (int i = 0; i < 5; i++) {
+        user = getTestUser();
+        userService.save(user);
+    }
 
-- 环境2: Oracle 12c，建DDL与MySQL略有不同
+    try {
+        Thread.sleep(5000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    // 查询
+    List<User> fetchUsers = userService.list();
+    log.info("total user =" + fetchUsers.size());
+    // 修改操作,取最后一个改
+    user = fetchUsers.get(fetchUsers.size() - 1);
+    userService.update(new UpdateWrapper<User>().eq("id", user.getId()).set("address", "addr:" + System.currentTimeMillis()));
+
+    fetchUsers = userService.list();
+    log.info("total user = " + fetchUsers.size());
+
+    //删除操作
+    if (fetchUsers.size() > 0) {
+        userService.removeById(fetchUsers.get(0).getId());
+    }
+
+    fetchUsers = userService.list();
+    log.info("Now, total user = " + fetchUsers.size());
+}
+```
+- 环境2: Oracle 12c，建DDL与MySQL略有不同，Mybatis对于主键id处理需要改一下Sequence，此处略
 
 **4、(选做):基于上一题，尝试对各个数据库测试100万订单数据的增删改查性能。**  
 // TODO: 完成一个测试模块，分别模拟100万个增删改查的测试（分为两部分，1仅测试主表 2订单主表+详情表）
