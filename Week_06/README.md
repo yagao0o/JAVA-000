@@ -110,6 +110,23 @@ public void addUser() {
 // TODO: 完成一个测试模块，分别模拟100万个增删改查的测试（分为两部分，1仅测试主表 2订单主表+详情表）
 // 分别对Oracle、MySQL（InnoDB、myisam、archive、memory），进行测试【包含了下一题】
 
+- 100万订单新增，（每次新增1000条，1000次）：
+  - MySQL InnoDB **821秒**
+```TXT
+2020-11-26 10:52:39.698  INFO 62233 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : start: 250468516534121
+2020-11-26 11:06:20.654  INFO 62233 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : end: 251289503764326
+2020-11-26 11:06:20.654  INFO 62233 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : 总消耗时间：820987230205
+```
+
+- 1万订单查询（每次查100条，查100次）：
+  - MySQL InnoDB **1429秒** 额……
+  ```
+  2020-11-26 16:58:31.204  INFO 67304 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : start: 272420883105965
+  2020-11-26 17:22:20.106  INFO 67304 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : end: 273849840179380
+  2020-11-26 17:22:20.107  INFO 67304 --- [nio-8080-exec-1] c.q.w.h.controller.HomeworkController    : 总消耗时间：1428957073415
+  ```
+
+
 **5、(选做):尝试对MySQL不同引擎下测试100万订单数据的增删改查性能。**  
 // TODO: InnoDB、myisam、archive、memory（memory不知道是否能支持100万订单数据）
 
