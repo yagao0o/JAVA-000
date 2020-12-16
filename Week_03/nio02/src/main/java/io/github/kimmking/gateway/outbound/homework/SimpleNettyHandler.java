@@ -1,4 +1,4 @@
-package io.github.kimmking.gateway.outbound.homework;
+package io.kimmking.rpcfx.client.netty;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -40,7 +40,7 @@ public class SimpleNettyHandler {
                             channel.pipeline().addLast(new HttpObjectAggregator(1024 * 10 * 1024));
                             //解压
                             channel.pipeline().addLast(new HttpContentDecompressor());
-                            channel.pipeline().addLast(new SimpleNettyChannelInboundHandler(fullRequest, ctx));
+                            channel.pipeline().addLast(new SimpleNettyChannelOutboundHandler(fullRequest, ctx));
                         }
                     });
             ChannelFuture channelFuture = bootstrap.connect().sync();

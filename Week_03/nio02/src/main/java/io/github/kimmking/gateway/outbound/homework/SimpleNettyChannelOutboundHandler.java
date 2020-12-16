@@ -1,4 +1,4 @@
-package io.github.kimmking.gateway.outbound.homework;
+package io.kimmking.rpcfx.client.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -20,10 +20,10 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  * @author : Luyz
  * @date : 2020/11/4 16:55
  */
-public class SimpleNettyChannelInboundHandler extends ChannelInboundHandlerAdapter {
+public class SimpleNettyChannelOutboundHandler extends ChannelInboundHandlerAdapter {
     private ChannelHandlerContext originCtx;
     private FullHttpRequest originRequest;
-    public SimpleNettyChannelInboundHandler(FullHttpRequest originRequest, ChannelHandlerContext originCtx) {
+    public SimpleNettyChannelOutboundHandler(FullHttpRequest originRequest, ChannelHandlerContext originCtx) {
         this.originCtx = originCtx;
         this.originRequest = originRequest;
     }
