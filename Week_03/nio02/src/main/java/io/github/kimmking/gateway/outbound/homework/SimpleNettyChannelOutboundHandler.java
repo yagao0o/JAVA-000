@@ -1,4 +1,4 @@
-package io.kimmking.rpcfx.client.netty;
+package io.github.kimmking.gateway.outbound.homework;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
