@@ -28,7 +28,13 @@
 - [第三周](./Week_03/README.md)
 - [第四周](./Week_04/README.md)
 - [第五周](./Week_05/README.md)
-- [第五周](./Week_06/README.md)
+- [第六周](./Week_06/README.md)
+- [第七周](./Week_07/README.md)
+- [第八周](./Week_08/README.md)
+- [第九周](./Week_09/README.md)
+- [第十周](./Week_10/README.md)
+- [第十一周](./Week_11/README.md)
+- [第十二周](./Week_12/README.md)
 
 ## 我的课程目标
 1. 30次直播课准时参与
